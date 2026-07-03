@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primer Mes Juntos <3</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;600;700&family=Dancing+Script:wght@700&family=EB+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --pink-bg: #FFD1DC;
+            --btn-purple: #E8DFFF;
+            --text-dark: #5C4033;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--pink-bg);
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 50px;
+        }
+
+        /* Fondo con puntitos para la sección de fotos */
+        .bg-dots {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.4) 2px, transparent 2px), radial-gradient(rgba(247, 141, 167, 0.3) 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            width: 100%;
+            min-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Bloqueo de seguridad */
+        #lock-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #050507;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+        }
+
+        .lock-container { text-align: center; padding: 20px; }
+        .lock-container h2 { font-size: 1.5rem; margin-bottom: 20px; letter-spacing: 1px; }
+        .lock-container input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            padding: 12px 20px; border-radius: 12px; color: white;
+            font-size: 1.1rem; text-align: center; outline: none; margin-bottom: 15px; width: 220px;
+        }
+        .lock-container button {
+            background: linear-gradient(135deg, #ff7893, #9d4edd);
+            border: none; padding: 12px 25px; color: white; border-radius: 12px;
+            font-weight: bold; cursor: pointer; width: 220px; font-size: 1rem;
+        }
+        #error-msg { color: #ff4a4a; font-size: 0.9rem; margin-top: 10px; display: none; }
+
+        /* Contenedor Principal */
+        #main-content {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px 15px;
+        }
+
+        /* Menú de navegación fijo arriba (5 botones originales) */
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px 13px;
+            margin-bottom: 25px;
+            position: sticky;
+            top: 0;
+            z-index: 900;
+            background: rgba(255, 209, 220, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 10px 0;
+        }
+
+        .nav-btn {
+            background-color: var(--btn-purple);
+            color: var(--text-dark);
+            border: none;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 23px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background-color: #ffbfcc;
+            transform: translateY(-2px);
+        }
+
+        /* Secciones */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+            width: 100%;
+            text-align: center;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Estilos Portada (Rosa continuo sin tarjeta blanca) */
+        .portada-title {
+            font-family: 'Fredoka', 'Montserrat', sans-serif;
+            font-size: 2.2rem;
+            margin-bottom: 26px;
+            font-style: oblique;
+            font-weight: 600;
+        }
+
+        .polaroid-frame {
+            background-color: #ffffff;
+            padding: 15px 15px 40px 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.72);
+            border: 15px solid #ffffff;
+            border-bottom-width: 40px;
+            border-radius: 10px 0 0 0;
+            transform: rotate(-2deg);
+            margin: 26px auto 0 auto;
+            width: 96.7%;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .polaroid-frame:hover {
+            transform: rotate(-2deg) scale(1.02);
+        }
+
+        .polaroid-frame img {
+            width: 100%;
+            display: block;
+        }
+
+        /* Estilos Historia (Carta Antigua) */
+        .letter-container {
+            background-color: #FAF4E8;
+            border: 1px solid #e3d3bd;
+            border-radius: 4px;
+            padding: 40px 30px;
+            box-shadow: 0 15px 35px rgba(92, 59, 74, 0.15), inset 0 0 50px rgba(139, 115, 85, 0.15);
+            font-family: 'EB Garamond', serif;
+            font-size: 1.25rem;
+            line-height: 1.8;
+            text-align: justify;
+            position: relative;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .letter-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border: 1px dashed rgba(139, 115, 85, 0.2);
+            margin: 8px;
+            pointer-events: none;
+        }
+
+        .letter-container h2 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.8rem;
+            text-align: center;
+            margin-bottom: 5px;
+            color: #5c3826;
+        }
+
+        .letter-date {
+            text-align: center;
+            font-style: italic;
+            color: #8c6d58;
+            margin-bottom: 30px;
+            font-size: 1.05rem;
+        }
+
+        .letter-body p {
+            margin-bottom: 22px;
+            text-indent: 15px;
+        }
+        .letter-body p:first-of-type { text-indent: 0; }
+
+        .highlight {
+            font-weight: bold;
+            color: #8c3b4a;
+        }
+
+        .letter-footer {
+            margin-top: 40px;
+            text-align: right;
+            padding-right: 15px;
+        }
+        .closing { font-style: italic; color: #6e4e3a; font-size: 1.2rem; margin-bottom: 10px; }
+        .signature { font-family: 'Dancing Script', cursive; font-size: 2.2rem; color: #8c3b4a; font-weight: 700; margin-top: 15px; }
+
+        .wax-seal {
+            width: 75px; height: 75px; margin: 40px auto 0 auto; display: block;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+        }
+
+        .back-btn-story {
+            display: inline-block; background: #8c3b4a; color: #ffffff; font-family: 'Playfair Display', serif;
+            font-size: 1rem; text-decoration: none; padding: 12px 30px; border-radius: 30px; margin-top: 35px; border: none; cursor: pointer;
+        }
+
+        /* Contadores en limpio flotando sobre rosa */
+        .contador-block {
+            padding: 30px;
+            margin-bottom: 10px;
+            text-align: center;
+            width: 100%;
+            font-family: 'Montserrat', sans-serif;
+            color: #5c5c5c;
+        }
+
+        .contador-title {
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #4a4a4a;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .contador-num {
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #4a4a4a;
+            margin-bottom: 5px;
+        }
+
+        .contador-sub {
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            color: #a1a1a1;
+        }
+
+        .contador-img {
+            width: 100%;
+            max-width: 768px;
+            display: block;
+            margin: 20px auto 0 auto;
+            border-radius: 0px;
+        }
+
+        /* Cartitas Virtuales en limpio */
+        .grid-cartas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            width: 100%;
+            padding: 20px 0;
+        }
+
+        .contenedor-carta-3d {
+            height: 250px;
+            perspective: 1000px;
+        }
+
+        .carta-interna {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .carta-interna.girada { transform: rotateY(180deg); }
+
+        .cara-delantera, .cara-trasera {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #ffffff;
+        }
+
+        .cara-delantera {
+            color: #4a4a4a;
+            box-shadow: 0 8px 24px rgba(244, 194, 204, 0.5);
+            border: 2px solid transparent;
+        }
+        .contenedor-carta-3d:hover .cara-delantera { border-color: #ffbfcc; }
+
+        .cara-trasera {
+            color: #5a5a5a;
+            transform: rotateY(180deg);
+            box-shadow: 0 10px 30px rgba(244, 194, 204, 0.7);
+            border: 3px double #f9d5e3;
+            justify-content: flex-start;
+            overflow-y: auto;
+            text-align: left;
+        }
+        .cara-trasera::-webkit-scrollbar { width: 5px; }
+        .cara-trasera::-webkit-scrollbar-thumb { background: #ffbfcc; border-radius: 10px; }
+
+        /* Polaroid de Álbum de Fotos */
+        .polaroid-album-card {
+            background-color: #ffffff;
+            padding: 15px 15px 22px 15px;
+            box-shadow: 0 15px 35px rgba(247, 141, 167, 0.4);
+            border-radius: 18px;
+            border: 1px solid rgba(247, 141, 167, 0.15);
+            width: 100%;
+            max-width: 330px;
+            margin: 0 auto;
+        }
+
+        .album-photo-slot {
+            width: 100%;
+            aspect-ratio: 1/1;
+            overflow: hidden;
+            background-color: #eaeaea;
+            border-radius: 10px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .album-photo-slot img {
+            width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.15s ease;
+        }
+
+        .slide-controls-wrap {
+            position: relative; width: 100%; max-width: 330px; margin: 0 auto; display: flex; align-items: center; justify-content: center;
+        }
+
+        .slide-arrow {
+            position: absolute; background-color: #ffffff; border: 2px solid #f9d5e3; width: 36px; height: 36px; border-radius: 50%;
+            cursor: pointer; font-size: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 99; color: #ff7893; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; padding: 0; line-height: 1;
+        }
+
+        /* Calendario en limpio */
+        .calendar-wrap {
+            width: 100%; max-width: 330px; margin: 25px auto 0 auto; background-color: #ffffff; padding: 20px 15px;
+            box-shadow: 0 15px 35px rgba(247, 141, 167, 0.4); border-radius: 18px; border: 1px solid rgba(247, 141, 167, 0.15);
+        }
+
+        .calendar-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; font-size: 0.85rem; font-weight: 600; color: #4a4a4a;
+        }
+        .cal-header { font-size: 0.7rem; font-weight: 700; color: #a1a1a1; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
+        .cal-day { padding: 5px 0; }
+        .event-sub { background-color: #ffeef2; border-radius: 8px; color: #ff7893; border: 1px dashed rgba(247, 141, 167, 0.4); }
+        .event-bad { background-color: #ff7893; border-radius: 8px; color: #ffffff; font-weight: 700; }
+        .event-love { position: relative; font-weight: 700; color: #ff7893; display: flex; align-items: center; justify-content: center; }
+        .event-love span { position: absolute; top: -6px; font-size: 0.75rem; color: #ff7893; }
+
+        /* Ajustes Móvil */
+        @media (max-width: 600px) {
+            body { padding-top: 10px; }
+            .letter-container { padding: 25px 15px; font-size: 1.05rem; }
+            .contador-num { font-size: 2rem; }
+            .contador-title { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PANTALLA DE BLOQUEO PRIVADA -->
+    <div id="lock-screen">
+        <div class="lock-container">
+            <h2 style="font-family:'Montserrat', sans-serif;">🔒 Acceso Privado</h2>
+            <input type="password" id="password-input" placeholder="Introduce la contraseña" onkeypress="handleKeyPress(event)">
+            <br>
+            <button onclick="checkPassword()">Entrar</button>
+            <div id="error-msg">Contraseña incorrecta, ¡vuelve a intentarlo! ⚡</div>
+        </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div id="main-content">
+        
+        <!-- MENÚ DE NAVEGACIÓN (5 BOTONES ORIGINALES) -->
+        <nav class="nav-menu">
+            <button class="nav-btn active" onclick="switchSection('portada', this)">Inicio</button>
+            <button class="nav-btn" onclick="switchSection('contadores', this)">Contadores</button>
+            <button class="nav-btn" onclick="switchSection('fotos', this)">Fotos</button>
+            <button class="nav-btn" onclick="switchSection('musica', this)">Música</button>
+            <button class="nav-btn" onclick="switchSection('cartas', this)">Cartitas</button>
+        </nav>
+
+        <!-- SECCIÓN PORTADA -->
+        <div id="portada" class="section active">
+            <div class="portada-title">Feliz primer mes &lt;3</div>
+            <div class="polaroid-frame" onclick="switchSection('historia')">
+                <img src="portada.jpeg" alt="Nuestra foto juntos">
+            </div>
+        </div>
+
+        <!-- SECCIÓN CONTADORES -->
+        <div id="contadores" class="section">
+            <!-- 1. Tiempo Juntos -->
+            <div class="contador-block">
+                <div class="contador-title">Tiempo Juntos</div>
+                <div class="contador-num" id="c-juntos">00d 00h 00m 00s</div>
+                <div class="contador-sub">contando cada segundo desde el 10/06/2026</div>
+                <img class="contador-img" src="contador1.jpeg" alt="Foto Tiempo Juntos">
+            </div>
+            <!-- 2. Cuenta atrás Boda -->
+            <div class="contador-block">
+                <div class="contador-title">Cuenta atrás para nuestra súper boda</div>
+                <div class="contador-num" id="c-boda">00d 00h 00m 00s</div>
+                <div class="contador-sub">(aunque el año pueda variar jejej)</div>
+                <img class="contador-img" src="contador2.jpeg" alt="Foto Boda">
+            </div>
+            <!-- 3. Horas de sueño perdidas -->
+            <div class="contador-block">
+                <div class="contador-title">Horas de sueño perdidas por quedarnos hablando hasta las 5:00 AM</div>
+                <div class="contador-num" id="c-sueno">0.00000000 horas</div>
+                <div class="contador-sub">(tengo ojeras por tu culpa, te voy a matar)</div>
+                <img class="contador-img" src="contador3.jpeg" alt="Foto Sueño">
+            </div>
+            <!-- 4. Cuenta atrás cumple -->
+            <div class="contador-block">
+                <div class="contador-title">Cuenta atrás para tu cumpleeeee</div>
+                <div class="contador-num" id="c-cumple">00d 00h 00m 00s</div>
+                <div class="contador-sub">(Un año menos para que te mueras y te cambie por otro)</div>
+                <img class="contador-img" src="contador4.jpeg" alt="Foto Cumple">
+            </div>
+            <!-- 5. Besos dados -->
+            <div class="contador-block">
+                <div class="contador-title">Aproximación de besos que te he dado</div>
+                <div class="contador-num" id="c-besos">0.00000000 besos</div>
+                <div class="contador-sub">(Aunque te los doy por obligación pero bueno)</div>
+                <img class="contador-img" src="contador5.jpeg" alt="Foto Besos">
+            </div>
+            <!-- 6. Tiempo para enfadarme -->
+            <div class="contador-block">
+                <div class="contador-title">Tiempo para que me enfade por cualquier tontería</div>
+                <div class="contador-num" id="c-rebelde" style="color: #ff4757;">15s</div>
+                <div class="contador-sub">(Siempre por tu culpa, si no me dieras motivos no lo haría)</div>
+                <img class="contador-img" src="contador6.jpeg" alt="Foto Enfadada">
+            </div>
+        </div>
+
+        <!-- SECCIÓN FOTOS (Fondo con puntitos) -->
+        <div id="fotos" class="section">
+            <div class="bg-dots">
+                <div style="font-size: 1.35rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-bottom: 15px; text-align: center; width: 100%;">📸 Nuestro Álbum de Fotitos</div>
+                
+                <div class="slide-controls-wrap">
+                    <button class="slide-arrow" onclick="changeSlide(-1)" style="left: -5px;">&lsaquo;</button>
+                    
+                    <div class="polaroid-album-card">
+                        <div class="album-photo-slot">
+                            <img id="album-img" src="slide1.jpeg" alt="Foto del álbum">
+                        </div>
+                        <div style="display: flex; gap: 15px; margin-top: 12px; font-size: 1.2rem; justify-content: flex-start; width: 100%; padding-left: 2px;">
+                            <i id="btn-corazon" class="fa-regular fa-heart" onclick="darLike()" style="color: #ff7893; cursor: pointer;"></i>
+                            <i class="fa-regular fa-comment" style="color: #4a4a4a;"></i>
+                            <i class="fa-regular fa-paper-plane" style="color: #4a4a4a;"></i>
+                        </div>
+                        <div style="margin-top: 12px; font-family: 'Caveat', cursive; font-size: 1.8rem; color: #ff7893; font-weight: bold;">Nuestros recuerdos juntos 💖</div>
+                    </div>
+
+                    <button class="slide-arrow" onclick="changeSlide(1)" style="right: -5px;">&rsaquo;</button>
+                </div>
+
+                <!-- CALENDARIO EN LIMPIO -->
+                <div class="calendar-wrap">
+                    <div style="text-align: center; font-family: 'Caveat', cursive; font-size: 2.2rem; color: #ff7893; font-weight: bold; margin-bottom: 15px;">Junio 2026</div>
+                    <div class="calendar-grid">
+                        <div class="cal-header">L</div><div class="cal-header">M</div><div class="cal-header">X</div><div class="cal-header">J</div><div class="cal-header">V</div><div class="cal-header">S</div><div class="cal-header">D</div>
+                        <div class="cal-day">1</div><div class="cal-day">2</div><div class="cal-day">3</div>
+                        <div class="cal-day event-sub">4</div><div class="cal-day event-sub">5</div><div class="cal-day event-sub">6</div>
+                        <div class="cal-day event-bad">7</div><div class="cal-day">8</div><div class="cal-day">9</div>
+                        <div class="cal-day event-love"><span>❤️</span>10</div><div class="cal-day">11</div><div class="cal-day">12</div><div class="cal-day">13</div><div class="cal-day">14</div>
+                        <div class="cal-day">15</div><div class="cal-day">16</div><div class="cal-day">17</div><div class="cal-day">18</div><div class="cal-day">19</div><div class="cal-day">20</div><div class="cal-day">21</div>
+                        <div class="cal-day">22</div><div class="cal-day">23</div><div class="cal-day">24</div><div class="cal-day">25</div><div class="cal-day">26</div><div class="cal-day">27</div><div class="cal-day">28</div>
+                        <div class="cal-day">29</div><div class="cal-day">30</div>
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed rgba(247, 141, 167, 0.2); font-size: 0.7rem; text-align: left; color: #7a7a7a; display: flex; flex-direction: column; gap: 4px;">
+                        <div><span style="display:inline-block; width: 8px; height: 8px; background-color: #ffeef2; border: 1px dashed #ff7893; border-radius: 2px; margin-right: 5px;"></span> 4-6: Subsónico</div>
+                        <div><span style="display:inline-block; width: 8px; height: 8px; background-color: #ff7893; border-radius: 2px; margin-right: 5px;"></span> 7: Concierto Bad Bunny Madrid</div>
+                        <div><span style="margin-right: 5px;">❤️</span> 10: El día más bonito del mes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN MÚSICA -->
+        <div id="musica" class="section">
+            <div style="width:100%; padding: 30px 15px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div style="background-color: #ffffff; padding: 35px 25px; box-shadow: 0 20px 50px rgba(247, 141, 167, 0.5); border-radius: 24px; width: 100%; text-align: center; border: 1px solid rgba(247, 141, 167, 0.2);">
+                    <div style="font-family: 'Caveat', cursive; font-size: 3.4rem; color: #ff7893; font-weight: bold; margin-bottom: 5px;">Nuestra Playlist 🎵</div>
+                    <div style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2.5px; color: #8e8e8e; font-weight: 700; margin-bottom: 30px;">Las canciones que nos definen</div>
+                    <iframe style="border-radius:16px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);" src="https://open.spotify.com/embed/playlist/5jaEc7Ku80LS5uU516IYnr?si=b6752e9ebe32467b" width="100%" height="400" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                    <div style="margin-top: 30px; font-family: 'Caveat', cursive; font-size: 2.2rem; color: #ff7893; font-weight: bold;">Cada canción me recuerda a ti 💟</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN CARTAS -->
+        <div id="cartas" class="section">
+            <div style="text-align:center; margin-bottom:25px;">
+                <div style="font-family: 'Caveat', cursive; font-size: 3.5rem; color: #ff7893; font-weight: bold; margin-bottom: 5px;">Tus Cartitas Virtuales 💌</div>
+                <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: #7a7a7a; font-weight: 600;">Haz clic sobre cualquier sobre para leerlo</div>
+            </div>
+            <div class="grid-cartas">
+                <!-- Carta 1 -->
+                <div class="contenedor-carta-3d">
+                    <div class="carta-interna" onclick="this.classList.toggle('girada')">
+                        <div class="cara-delantera">
+                            <i class="fa-solid fa-envelope" style="font-size: 2.5rem; color: #ff7893; margin-bottom: 12px;"></i>
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.8rem; font-weight: bold; color: #ff7893; margin-bottom: 5px;">Abre cuando estés triste</div>
+                            <div style="font-size: 0.8rem; color: #7a7a7a; font-style: italic;">Para cuando necesites un abrazo y yo no pueda dártelo</div>
+                        </div>
+                        <div class="cara-trasera">
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.6rem; color: #ff7893; font-weight: bold; margin-bottom: 8px; width:100%; border-bottom: 1px dashed #f9d5e3;">Mi amor</div>
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.35rem; line-height: 1.4;">Si estás leyendo esto es porque hoy no es un buen día y las cosas se ven un poco grises. Solo quiero recordarte que no es malo no estar bien a veces, pero no quiero que olvides lo increíble que eres. Desde que entraste en mi vida, entendí que no hace falta mirar a las estrellas para ver el brillo más bonito del mundo, a mí me basta con mirar tus ojitos color miel, mi amor eres la persona que me hace olvidar todos los problemas solo con una sonrisa. Hoy me toca a mí ser ese refugio para ti.<br><br>Acuérdate de cómo empezó todo, las visitas en el patio, cuando quedabamos los tres en casa del charly o cuando te mandaba fotos de los vinilos que me había comprado y por último, y lo más importante, de cuando me hablaste con la excusa del partido y ya a partir de ahí empezamos a hablar todos los días. Hemos construido algo super bonito.<br><br>No estás solo en esto mi amor, cierra los ojos, respira hondo y siente este abrazo que te mando desde aquí. Te quiero muchísimo, todo va a pasar amor. ❤️</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Carta 2 -->
+                <div class="contenedor-carta-3d">
+                    <div class="carta-interna" onclick="this.classList.toggle('girada')">
+                        <div class="cara-delantera">
+                            <i class="fa-solid fa-envelope" style="font-size: 2.5rem; color: #ff7893; margin-bottom: 12px;"></i>
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.8rem; font-weight: bold; color: #ff7893; margin-bottom: 5px;">Abre cuando me eches de menos</div>
+                            <div style="font-size: 0.8rem; color: #7a7a7a; font-style: italic;">Para cuando el día se haga largo y quieras tenerme cerca</div>
+                        </div>
+                        <div class="cara-trasera">
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.6rem; color: #ff7893; font-weight: bold; margin-bottom: 8px; width:100%; border-bottom: 1px dashed #f9d5e3;">Holi cariño</div>
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.35rem; line-height: 1.4;">Supongo que ahora mismo me estás echando un poquito de menos (normal la verdad jejejej). Aunque yo seguro que no te estoy echando de menos, es bromi anda seguro que yo te estoy echando más de menos que tú a mí.<br><br>Cuando llevamos tanto sin vernos, a mí me encanta ponerme a pensar en nosotros y en todo lo bonito que estamos construyendo, osea que loco, quien me diria a mí que acabaría contigo, si eres un poligonero que trabaja haciendo pizzas, pero bueno, como dice mi madre nunca digas de este agua no beberé porque mira, justo ha pasado eso (por desgracia).<br><br>Y nada aunque llevamos poquito tiempo, un mes, que por cierto ha sido el más bonito de todos, pero quiero que sepas que me tienes aquí para lo que sea. No importa dónde estés o qué estés haciendo, estoy a un mensaje o una llamada amor. Sonríe, piensa en el próximo beso que te voy a dar y quédate con esto, te quiero muchito y estoy contando las horas para verte.</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Carta 3 -->
+                <div class="contenedor-carta-3d">
+                    <div class="carta-interna" onclick="this.classList.toggle('girada')">
+                        <div class="cara-delantera">
+                            <i class="fa-solid fa-envelope" style="font-size: 2.5rem; color: #ff7893; margin-bottom: 12px;"></i>
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.8rem; font-weight: bold; color: #ff7893; margin-bottom: 5px;">Abre cuando consigas algo difícil</div>
+                            <div style="font-size: 0.8rem; color: #7a7a7a; font-style: italic;">Para cuando demuestres (otra vez) lo increíble que eres</div>
+                        </div>
+                        <div class="cara-trasera">
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.6rem; color: #ff7893; font-weight: bold; margin-bottom: 8px; width:100%; border-bottom: 1px dashed #f9d5e3;">¡Qué orgullo!</div>
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.35rem; line-height: 1.4;">No te imaginas el orgullo que siento ahora mismo. Sé perfectamente lo mucho que has trabajado por esto, las ganas que le has echado y los momentos en los que te rayaste, pero yo nunca tuve dudas de ti. Tienes una fuerza y una constancia que ojalá yo la verdad, pero bueno, si has conseguido esto es porque tu te has esforzado como nadie para conseguirlo y mira, ya está todo este éxito es el resultado de tanto esfuerzo y dedicación.<br><br>Me hace muuuy feliz poder estar a tu lado en esta etapa, ver tus logros y celebrarlos contigo, eres enorme, amor. Hoy toca celebrarlo por todo lo alto, presumir de lo que has hecho y sobre todo, que te creas lo mucho que vales. Te adoro y estoy súper orgullosa de tiiii</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Carta 4 -->
+                <div class="contenedor-carta-3d">
+                    <div class="carta-interna" onclick="this.classList.toggle('girada')">
+                        <div class="cara-delantera">
+                            <i class="fa-solid fa-envelope" style="font-size: 2.5rem; color: #ff7893; margin-bottom: 12px;"></i>
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.8rem; font-weight: bold; color: #ff7893; margin-bottom: 5px;">Abre cuando discutamos</div>
+                            <div style="font-size: 0.8rem; color: #7a7a7a; font-style: italic;">Para cuando el orgullo nos gane y toque recordar lo importante</div>
+                        </div>
+                        <div class="cara-trasera">
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.6rem; color: #ff7893; font-weight: bold; margin-bottom: 8px; width:100%; border-bottom: 1px dashed #f9d5e3;">Mi vida.</div>
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.35rem; line-height: 1.4;">Si estás leyendo esto es porque seguramente nos hemos enfadado, bueno más bien yo jejejej. Seguramente estemos en ese silencio incómodo que odio. Escribo esto ahora que estoy tranquila para que lo leas cuando las cosas estén calientes, lo siento, te lo digo escrito porque sabes que a mí es algo que me cuesta mucho decir y más si estoy enfadada.<br><br>No me gusta estar mal contigo, me duele en el alma. Sé que soy muy cabezona (acuérdate de lo empeñada que estaba diciendo que solo eras mi mejor amigo y que te veía como mi hermano mayor, cuando el resto del mundo veía lo obvio), y sé que a veces nos costará entendernos. Pero todo nuestro tiempo juntos y todo lo que me haces sentir vale muchísimo más que cualquier tontería por la que estemos discutiendo o estemos enfadados.<br><br>No quiero tener la razón, quiero estar bien contigo. Vamos a dejar el orgullo a un lado, vamos a hablar (aunque yo no quiera) y dame un abrazo de esos que lo curan todo. Te quiero.</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Carta 5 -->
+                <div class="contenedor-carta-3d">
+                    <div class="carta-interna" onclick="this.classList.toggle('girada')">
+                        <div class="cara-delantera">
+                            <i class="fa-solid fa-envelope" style="font-size: 2.5rem; color: #ff7893; margin-bottom: 12px;"></i>
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.8rem; font-weight: bold; color: #ff7893; margin-bottom: 5px;">Abre cuando estés muy feliz</div>
+                            <div style="font-size: 0.8rem; color: #7a7a7a; font-style: italic;">Para cuando sientas que te vas a comer el mundo</div>
+                        </div>
+                        <div class="cara-trasera">
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.6rem; color: #ff7893; font-weight: bold; margin-bottom: 8px; width:100%; border-bottom: 1px dashed #f9d5e3;">Holaaa amorrr</div>
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.35rem; line-height: 1.4;">Me encanta saber que estás leyendo esto con una sonrisa de oreja a oreja. Tu felicidad es la mía, de verdad. Desde que estamos juntos, me he dado cuenta de que lo bonito de la vida se multiplica cuando lo compartes con alguien que te suma tanto como tú a mí.<br><br>Gracias por contagiarme siempre tu buena energía (y tus constipados), por hacerme ver todo tan bonito y por ser esa pieza que hace que todo encaje a la perfección. Disfruta un montón de este momento, quédate con esa sensación en el cuerpo y guárdame un poquito de esa felicidad para cuando nos veamos que voy a necesitar tu motivación para no tener que usar mi super frase (me quiero morir).<br><br>Te amo mucho cariño estoy súper contenta de que estés así de feliz, porque si tu estás feliz yo estoy el doble. Y bueno te lo acabo de decir pero te amo muchito jejejjee</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Carta 6 -->
+                <div class="contenedor-carta-3d">
+                    <div class="carta-interna" onclick="this.classList.toggle('girada')">
+                        <div class="cara-delantera">
+                            <i class="fa-solid fa-envelope" style="font-size: 2.5rem; color: #ff7893; margin-bottom: 12px;"></i>
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.7rem; font-weight: bold; color: #ff7893; margin-bottom: 5px;">Abre cuando vayas a un sitio sin mí</div>
+                            <div style="font-size: 0.8rem; color: #7a7a7a; font-style: italic;">Para cuando estés por ahí y te acuerdes de mí</div>
+                        </div>
+                        <div class="cara-trasera">
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.6rem; color: #ff7893; font-weight: bold; margin-bottom: 8px; width:100%; border-bottom: 1px dashed #f9d5e3;">Holi cariñeeett</div>
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.35rem; line-height: 1.4;">Sé que estás en un sitio genial y que a lo mejor has tenido ese momento de mirar a tu alrededor y pensar "Ojalá estuviera ella aquí para ver esto o para reírse de esto conmigo". Te entiendo perfectamente, porque a mí me pasa igual.<br><br>Pero una cosa, quiero que aunque yo no esté ahí contigo disfrutes lo máximo que puedas y que no te pongas triste porque no estoy a tu lado, como me entere que has estado todo el rato triste pensando en mí me enfado, así que ya sabes.<br><br>Acuérdate de cuando nos dejaron tirados en el rocanrola y nos tocó buscarnos la vida, al final las cosas improvisadas son las que mejor salen. No dejes de disfrutar, de reírte y de pasártelo increíble solo porque yo no esté ahí físicamente. Pásatelo genial por los dos, vive la experiencia y luego vienes corriendo a contármelo todo. Yo te estaré esperando aquí con los brazos abiertos. Pasatelo genial mi vida, te amo. 💖</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Carta 7 (Trol) -->
+                <div class="contenedor-carta-3d">
+                    <div class="carta-interna" onclick="this.classList.toggle('girada')">
+                        <div class="cara-delantera">
+                            <i class="fa-solid fa-envelope" style="font-size: 2.5rem; color: #ff7893; margin-bottom: 12px;"></i>
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.7rem; font-weight: bold; color: #ff7893; margin-bottom: 5px;">Abre esta carta ahora</div>
+                            <div style="font-size: 0.8rem; color: #7a7a7a; font-style: italic;">Lol caracol</div>
+                        </div>
+                        <div class="cara-trasera" onclick="switchSection('portada')" style="cursor:pointer; align-items:center; justify-content:center;">
+                            <div style="font-family: 'Caveat', cursive; font-size: 1.5rem; text-align: center; color: #5a5a5a; font-weight: bold;">Vuelve a la página de inicio y dale a la foto de la portada 🌹</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN NUESTRA HISTORIA (OCULTA) -->
+        <div id="historia" class="section">
+            <article class="letter-container">
+                <h2>Nuestra Historia</h2>
+                <div class="letter-date">El primer mes de tooodos los que faltan 🌹</div>
+                <div class="letter-body">
+                    <p>De verdad si hace unos meses alguien me dice que hoy llevaríamos un mes juntos y que estaría escribiéndote cartitas no me lo hubiese creído, pero aquí estamos y no me puedo alegrar más de estar así. Todo empezó de la forma que menos me esperaba, en la llamada donde Charly te metió para que te hicieras pasar por el Alan de mi clase y ya después viniste al patio a ver a Charly, te conocí en persona y me caíste genial desde el primer momento, luego la comida en el Fosters con Lucas y Carlos, donde Charly te pregunto: quedaréis para estar un rato o algo (en el roncarola), yo respondí: si tal nos saludaremos supongo (ovbiamente sin imaginarme que al final me tocaría aguantarte tooodo el festival).</p>
+                    <p>Justo esa tarde me solicitaste en Insta y pasaron los meses hasta que me escribiste con la excusa de pedirme el link para ver mi partido de la Copa de la Reina (que desgracia no tendría q haberte respondido, eso me pasa por ser maja 😞😞😞). Y bueno ya desde ese día, no volvimos a dejar de hablar, quedamos por primera vez a solas, y me acuerdo que estaba cagadísima por si te lanzabas o algo pero el plan salió genial y me compré mucho maquillaje jejejej, me caíste genial genial y se convirtió en una rutina el vernos día tras día.</p>
+                    <p>Cuando yo volvía de la autoescuela y me acompañabas hasta casa y luego volvías solito a las 2 de la mañana, encima la primera vez te robaron el mechero jejejej pobrecito michico. Y entonces llegó el rocanrola, donde por casualidad nos dejaron tirados a los dos, supongo que cosas del destino vaya, porque nos tocó ir juntos y encima tatuarnos juntos (yo por obligación). Ahí ya notaba que sentía algo muuuuy muuuy pero MUY al fondo aunque yo seguía súper empeñada con lo de que no me gustabas, eras solo mi mejor amigo y ya está. Estaba súper cerrada, tanto que cuando terminó el festival y te declaraste, te tiré la de que no me veía en una relación y que te quería solo como amigo, menos mal que fuiste paciente e insistente conmigo.</p>
+                    <p>Porque un mes después nos fuimos a Madrid, y entre el festival, el concierto de Bad Bunny, las risas, la adrenalina de ver al jarfa y a l’haine y el estar juntos en madrid hizo que todo fluyera. De repente me di cuenta de lo tonta que había sido al negar lo obvio, lo nuestro surgió de la forma más bonita posible. Nunca se me va a olvidar cuando tuvimos que pasar la noche en la estación de autobuses, todo lleno de yonkis y vagabundos, yo estaba muy cagada pero tú me hiciste sentir completamente segura e hiciste que esa noche se convirtiera en una de las más especiales de mi vida.</p>
+                    <p>Ahora llevamos un mes compartiendo la vida de otra manera, sé que es poquito tiempo, pero quería aprovechar esta carta para decirte algo que a veces me cuesta expresar con palabras. <span class="highlight">No tienes ni idea de cuánto te quiero.</span> Llegaste a mi vida en el momento perfecto, me has ayudado a olvidarme de todos mis problemas y gracias a ti todo lo veo muchísimo más bonito. Eres literalmente mi luz en la oscuridad y mi motivo para sonreír cada día. Además de ser el claro ejemplo de que todo pasa por algo.</p>
+                    <p>Gracias por tener tanta paciencia conmigo cuando solo éramos “amigos” y por ser el mejor novio del mundo.</p>
+                </div>
+                <div class="letter-footer">
+                    <p class="closing">Feliz primer mes mi amor. Por todos los que vendrán.</p>
+                    <p class="signature">Te amo 💚</p>
+                </div>
+                <!-- Sello de lacre SVG con corazón -->
+                <svg class="wax-seal" viewBox="0 0 100 100">
+                    <path d="M50,12 C65,11 82,18 86,34 C90,50 89,68 78,79 C67,90 46,92 32,86 C18,80 11,62 14,46 C17,30 35,13 50,12 Z" fill="#9e1b32" opacity="0.95" />
+                    <path d="M50,15 C62,14 78,21 81,35 C84,49 81,64 72,73 C63,82 45,84 33,79 C21,74 16,59 19,45 C22,31 38,16 50,15 Z" fill="#b01e3a" />
+                    <circle cx="50" cy="50" r="28" fill="none" stroke="#7d1225" stroke-width="2.5" stroke-dasharray="2,2" />
+                    <path d="M50,38 C47,33 40,33 37,36 C33,40 33,47 37,51 L50,64 L63,51 C67,47 67,40 63,36 C60,33 53,33 50,38 Z" fill="#7d1225" />
+                    <path d="M30,25 C38,20 46,20 54,22" fill="none" stroke="#ff8093" stroke-width="2" stroke-linecap="round" opacity="0.4" />
+                </svg>
+                <div style="text-align: center;"><button class="back-button-story" onclick="switchSection('portada')">Volver al Inicio</button></div>
+            </article>
+        </div>
+
+    </div>
+
+    <script>
+        const SECRET_PASSWORD = "2026";
+
+        function checkPassword() {
+            const input = document.getElementById("password-input").value;
+            if (input === SECRET_PASSWORD) {
+                document.getElementById("lock-screen").style.display = "none";
+                document.getElementById("main-content").style.display = "block";
+                initCounters();
+            } else {
+                document.getElementById("error-msg").style.display = "block";
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") { checkPassword(); }
+        }
+
+        function switchSection(sectionId, btn) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Hacer scroll arriba al cambiar de pestaña
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if(btn) {
+                const buttons = document.querySelectorAll('.nav-btn');
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            } else {
+                // Si cambiamos por código (como al pulsar la foto), marcar botón activo
+                const buttons = document.querySelectorAll('.nav-btn');
+                buttons.forEach(b => b.classList.remove('active'));
+                if (sectionId === 'portada') buttons[0].classList.add('active');
+            }
+        }
+
+        // --- CÓDIGO DE LOS CONTADORES ---
+        const fechaInicio = new Date('2026-06-10T03:24:00').getTime();
+        const fechaBoda = new Date('2031-04-27T12:00:00').getTime();
+        const fechaCumple = new Date('2026-08-16T00:00:00').getTime();
+
+        function initCounters() {
+            setInterval(() => {
+                const ahora = new Date().getTime();
+                
+                // 1. Tiempo Juntos
+                const diffJuntos = ahora - fechaInicio;
+                const dJ = Math.floor(diffJuntos / (1000*60*60*24));
+                const hJ = Math.floor((diffJuntos % (1000*60*60*24)) / (1000*60*60));
+                const mJ = Math.floor((diffJuntos % (1000*60*60)) / (1000*60));
+                const sJ = Math.floor((diffJuntos % (1000*60)) / 1000);
+                document.getElementById('c-juntos').innerText = `${dJ}d ${sPad(hJ)}h ${sPad(mJ)}m ${sPad(sJ)}s`;
+
+                // 2. Cuenta Boda
+                const diffBoda = fechaBoda - ahora;
+                const dB = Math.floor(diffBoda / (1000*60*60*24));
+                const hB = Math.floor((diffBoda % (1000*60*60*24)) / (1000*60*60));
+                const mB = Math.floor((diffBoda % (1000*60*60)) / (1000*60));
+                const sB = Math.floor((diffBoda % (1000*60)) / 1000);
+                document.getElementById('c-boda').innerText = `${dB}d ${sPad(hB)}h ${sPad(mB)}m ${sPad(sB)}s`;
+
+                // 4. Cuenta Cumple
+                const diffCumple = fechaCumple - ahora;
+                const dC = Math.floor(diffCumple / (1000*60*60*24));
+                const hC = Math.floor((diffCumple % (1000*60*60*24)) / (1000*60*60));
+                const mC = Math.floor((diffCumple % (1000*60*60)) / (1000*60));
+                const sC = Math.floor((diffCumple % (1000*60)) / 1000);
+                document.getElementById('c-cumple').innerText = `${dC}d ${sPad(hC)}h ${sPad(mC)}m ${sPad(sC)}s`;
+            }, 1000);
+
+            // 3 y 5: Ráfagas rápidas (Cada 50ms con decimales)
+            setInterval(() => {
+                const ahora = new Date().getTime();
+                const diffMs = ahora - fechaInicio;
+                const dias = diffMs / (1000*60*60*24);
+                
+                document.getElementById('c-sueno').innerText = (dias * 3).toFixed(8) + " horas";
+                document.getElementById('c-besos').innerText = (dias * 15).toFixed(8) + " besos";
+            }, 50);
+
+            iniciarCicloRebelde();
+        }
+
+        function sPad(n) { return n < 10 ? '0'+n : n; }
+
+        let rebeldeInterval;
+        function iniciarCicloRebelde() {
+            clearInterval(rebeldeInterval);
+            let tiempo = Math.floor(Math.random() * 30) + 10;
+            document.getElementById('c-rebelde').innerText = tiempo + "s";
+            rebeldeInterval = setInterval(() => {
+                if (tiempo > 0) {
+                    tiempo--;
+                    document.getElementById('c-rebelde').innerText = tiempo + "s";
+                } else {
+                    iniciarCicloRebelde();
+                }
+            }, 1000);
+        }
+
+        // --- ÁLBUM DE FOTOS INTERACTIVO ---
+		const fotos = [
+			"slide1.jpeg", "slide2.jpeg", "slide3.jpeg", "slide4.jpeg", "slide5.jpeg",
+			"slide6.jpeg", "slide7.jpeg", "slide8.jpeg", "slide9.jpeg", "slide10.jpeg", "slide11.jpeg",
+			"slide12.jpeg", "slide13.jpeg", "slide14.jpeg", "slide15.jpeg"
+		];
+        let currentSlide = 0;
+        function changeSlide(dir) {
+            const imgEl = document.getElementById('album-img');
+            if(!imgEl) return;
+            imgEl.style.opacity = '0.3';
+            setTimeout(() => {
+                currentSlide += dir;
+                if(currentSlide >= fotos.length) currentSlide = 0;
+                if(currentSlide < 0) currentSlide = fotos.length - 1;
+                imgEl.src = fotos[currentSlide];
+                imgEl.style.opacity = '1';
+                document.getElementById('btn-corazon').className = "fa-regular fa-heart";
+            }, 150);
+        }
+
+        function darLike() {
+            const corazon = document.getElementById('btn-corazon');
+            if (corazon.classList.contains('fa-regular')) {
+                corazon.className = "fa-solid fa-heart";
+                corazon.style.transform = "scale(1.3)";
+                setTimeout(() => corazon.style.transform = "scale(1)", 200);
+            } else {
+                corazon.className = "fa-regular fa-heart";
+            }
+        }
+    </script>
+</body>
+</html>
